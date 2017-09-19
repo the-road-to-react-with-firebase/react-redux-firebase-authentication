@@ -35,9 +35,9 @@ class HomePage extends Component {
 
 const UserList = ({ users }) =>
   <div>
-    <h2>List of App Users (Saved on Sign Up)</h2>
+    <h2>List of App User IDs (Saved on Sign Up in Firebase Database)</h2>
     {users.map(user =>
-      <div key={user.index}>{user.username} ({user.index})</div>
+      <div key={user.index}>{user.index}</div>
     )}
   </div>
 
