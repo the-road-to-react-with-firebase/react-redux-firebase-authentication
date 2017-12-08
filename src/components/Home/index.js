@@ -49,7 +49,9 @@ const mapDispatchToProps = (dispatch) => ({
   onSetUsers: (users) => dispatch({ type: 'USERS_SET', users }),
 });
 
+const authCondition = (authUser) => !!authUser;
+
 export default compose(
-  withAuthorization(true),
+  withAuthorization(authCondition),
   connect(mapStateToProps, mapDispatchToProps)
 )(HomePage);
