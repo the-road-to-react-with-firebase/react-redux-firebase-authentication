@@ -1,5 +1,5 @@
 const INITIAL_STATE = {
-  users: [],
+  users: {},
 };
 
 const applySetUsers = (state, action) => ({

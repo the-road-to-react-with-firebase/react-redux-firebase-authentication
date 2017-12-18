@@ -5,17 +5,12 @@ import { compose } from 'recompose';
 import withAuthorization from '../Session/withAuthorization';
 import { db } from '../../firebase';
 
-const fromObjectToList = (object) =>
-  object
-    ? Object.keys(object).map(key => ({ ...object[key], index: key }))
-    : [];
-
 class HomePage extends Component {
   componentDidMount() {
     const { onSetUsers } = this.props;
 
     db.onceGetUsers().then(snapshot =>
-      onSetUsers(fromObjectToList(snapshot.val()))
+      onSetUsers(snapshot.val())
     );
   }
 
@@ -27,7 +22,7 @@ class HomePage extends Component {
         <h1>Home</h1>
         <p>The Home Page is accessible by every signed in user.</p>
 
-        { !!users.length && <UserList users={users} /> }
+        { !!users && <UserList users={users} /> }
       </div>
     );
   }
@@ -35,9 +30,11 @@ class HomePage extends Component {
 
 const UserList = ({ users }) =>
   <div>
-    <h2>List of App User IDs (Saved on Sign Up in Firebase Database)</h2>
-    {users.map(user =>
-      <div key={user.index}>{user.index}</div>
+    <h2>List of Usernames of Users</h2>
+    <p>(Saved on Sign Up in Firebase Database)</p>
+
+    {Object.keys(users).map(key =>
+      <div key={key}>{users[key].username}</div>
     )}
   </div>
 
