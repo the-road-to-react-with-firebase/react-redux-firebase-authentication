@@ -1,8 +1,17 @@
-import { auth } from './firebase';
+import { auth, firebase } from './firebase';
 
 // Sign Up
 export const doCreateUserWithEmailAndPassword = (email, password) =>
   auth.createUserWithEmailAndPassword(email, password);
+
+// Sign Up
+const fbProvider = new firebase.auth.FacebookAuthProvider();
+export const doSignInWithFacebook = () =>
+  auth.signInWithPopup(fbProvider);
+
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const doSignInWithGoogle = () =>
+  auth.signInWithPopup(googleProvider);
 
 // Sign In
 export const doSignInWithEmailAndPassword = (email, password) =>

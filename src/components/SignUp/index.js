@@ -11,6 +11,11 @@ const SignUpPage = ({ history }) =>
   <div>
     <h1>SignUp</h1>
     <SignUpForm history={history} />
+    <div>
+      <SignupWithFacebook history={history} />
+      <span>Ou</span>
+      <SignupWithGoogle history={history} />
+    </div>
   </div>
 
 const updateByPropertyName = (propertyName, value) => () => ({
@@ -22,6 +27,10 @@ const INITIAL_STATE = {
   email: '',
   passwordOne: '',
   passwordTwo: '',
+  error: null,
+};
+
+const INITIAL_SOCIAL_STATE = {
   error: null,
 };
 
@@ -111,6 +120,102 @@ class SignUpForm extends Component {
 
         { error && <p>{error.message}</p> }
       </form>
+    );
+  }
+}
+
+class SignupWithFacebook extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { ...INITIAL_SOCIAL_STATE };
+  }
+
+  onClick = (event) => {
+    const {
+      history,
+    } = this.props;
+
+    auth.doSignInWithFacebook()
+      .then(socialAuthUser => {
+        const authUser = socialAuthUser.user;
+
+        // Create a user in your own accessible Firebase Database too
+        db.doCreateUser(authUser.uid, "", authUser.email || "", authUser.displayName, authUser.photoURL)
+          .then(() => {
+            this.setState(() => ({ ...INITIAL_SOCIAL_STATE }));
+            history.push(routes.HOME);
+          })
+          .catch(error => {
+            this.setState(updateByPropertyName('error', error));
+          });
+
+      })
+      .catch(error => {
+        this.setState(updateByPropertyName('error', error));
+      });
+
+    event.preventDefault();
+  }
+
+  render() {
+    const {
+      error,
+    } = this.state;
+
+    return (
+      <div>
+        <button onClick={this.onClick}>Facebook</button>
+        { error && <p>{error.message}</p> }
+      </div>
+    );
+  }
+}
+
+class SignupWithGoogle extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { ...INITIAL_SOCIAL_STATE };
+  }
+
+  onClick = (event) => {
+    const {
+      history,
+    } = this.props;
+
+    auth.doSignInWithGoogle()
+      .then(socialAuthUser => {
+        const authUser = socialAuthUser.user;
+
+        // Create a user in your own accessible Firebase Database too
+        db.doCreateUser(authUser.uid, "", authUser.email || "", authUser.displayName, authUser.photoURL)
+          .then(() => {
+            this.setState(() => ({ ...INITIAL_SOCIAL_STATE }));
+            history.push(routes.HOME);
+          })
+          .catch(error => {
+            this.setState(updateByPropertyName('error', error));
+          });
+
+      })
+      .catch(error => {
+        this.setState(updateByPropertyName('error', error));
+      });
+
+    event.preventDefault();
+  }
+
+  render() {
+    const {
+      error,
+    } = this.state;
+
+    return (
+      <div>
+        <button onClick={this.onClick}>Google</button>
+        { error && <p>{error.message}</p> }
+      </div>
     );
   }
 }
