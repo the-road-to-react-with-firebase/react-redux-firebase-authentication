@@ -13,7 +13,7 @@ const SignUpPage = ({ history }) =>
     <SignUpForm history={history} />
     <div>
       <SignupWithFacebook history={history} />
-      <span>Ou</span>
+      <span>or</span>
       <SignupWithGoogle history={history} />
     </div>
   </div>
