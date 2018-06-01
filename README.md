@@ -8,7 +8,7 @@
 
 * uses:
   * React (create-react-app)
-  * firebase 4.3.1
+  * firebase 5.0.0
   * react-router 4.2.0
   * redux
 * features:
