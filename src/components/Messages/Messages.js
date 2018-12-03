@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-import { AuthUserContext } from '../Session';
 import { withFirebase } from '../Firebase';
 import MessageList from './MessageList';
 
@@ -83,52 +82,49 @@ class Messages extends Component {
     const { text, loading } = this.state;
 
     return (
-      <AuthUserContext.Consumer>
-        {authUser => (
-          <div>
-            {!loading && messages && (
-              <button type="button" onClick={this.onNextPage}>
-                More
-              </button>
-            )}
-
-            {loading && <div>Loading ...</div>}
-
-            {messages && (
-              <MessageList
-                messages={messages.map(message => ({
-                  ...message,
-                  user: users
-                    ? users[message.userId]
-                    : { userId: message.userId },
-                }))}
-                onEditMessage={this.onEditMessage}
-                onRemoveMessage={this.onRemoveMessage}
-              />
-            )}
-
-            {!messages && <div>There are no messages ...</div>}
-
-            <form
-              onSubmit={event =>
-                this.onCreateMessage(event, authUser)
-              }
-            >
-              <input
-                type="text"
-                value={text}
-                onChange={this.onChangeText}
-              />
-              <button type="submit">Send</button>
-            </form>
-          </div>
+      <div>
+        {!loading && messages && (
+          <button type="button" onClick={this.onNextPage}>
+            More
+          </button>
         )}
-      </AuthUserContext.Consumer>
+
+        {loading && <div>Loading ...</div>}
+
+        {messages && (
+          <MessageList
+            messages={messages.map(message => ({
+              ...message,
+              user: users
+                ? users[message.userId]
+                : { userId: message.userId },
+            }))}
+            onEditMessage={this.onEditMessage}
+            onRemoveMessage={this.onRemoveMessage}
+          />
+        )}
+
+        {!messages && <div>There are no messages ...</div>}
+
+        <form
+          onSubmit={event =>
+            this.onCreateMessage(event, this.props.authUser)
+          }
+        >
+          <input
+            type="text"
+            value={text}
+            onChange={this.onChangeText}
+          />
+          <button type="submit">Send</button>
+        </form>
+      </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
+  authUser: state.sessionState.authUser,
   messages: Object.keys(state.messageState.messages || {}).map(
     key => ({
       ...state.messageState.messages[key],
