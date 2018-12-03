@@ -1,54 +1,271 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-import withAuthorization from '../Session/withAuthorization';
-import { db } from '../../firebase';
+import {
+  AuthUserContext,
+  withAuthorization,
+  withEmailVerification,
+} from '../Session';
+import { withFirebase } from '../Firebase';
 
 class HomePage extends Component {
-  componentDidMount() {
-    const { onSetUsers } = this.props;
+  constructor(props) {
+    super(props);
 
-    db.onceGetUsers().then(snapshot =>
-      onSetUsers(snapshot.val())
-    );
+    this.state = {
+      loading: false,
+      users: null,
+    };
+  }
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    this.props.firebase.users().on('value', snapshot => {
+      this.setState({
+        users: snapshot.val(),
+        loading: false,
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.firebase.users().off();
   }
 
   render() {
-    const { users } = this.props;
+    const { users, loading } = this.state;
 
     return (
       <div>
-        <h1>Home</h1>
+        <h1>Home Page</h1>
         <p>The Home Page is accessible by every signed in user.</p>
 
-        { !!users && <UserList users={users} /> }
+        <Messages users={users} usersLoading={loading} />
       </div>
     );
   }
 }
 
-const UserList = ({ users }) =>
-  <div>
-    <h2>List of Usernames of Users</h2>
-    <p>(Saved on Sign Up in Firebase Database)</p>
+class MessagesBase extends Component {
+  constructor(props) {
+    super(props);
 
-    {Object.keys(users).map(key =>
-      <div key={key}>{users[key].username}</div>
-    )}
-  </div>
+    this.state = {
+      text: '',
+      loading: false,
+      messages: [],
+      limit: 5,
+    };
+  }
 
-const mapStateToProps = (state) => ({
-  users: state.userState.users,
-});
+  componentDidMount() {
+    this.onListenForMessages();
+  }
 
-const mapDispatchToProps = (dispatch) => ({
-  onSetUsers: (users) => dispatch({ type: 'USERS_SET', users }),
-});
+  onListenForMessages = () => {
+    this.setState({ loading: true });
 
-const authCondition = (authUser) => !!authUser;
+    this.props.firebase
+      .messages()
+      .orderByChild('createdAt')
+      .limitToLast(this.state.limit)
+      .on('value', snapshot => {
+        const messageObject = snapshot.val();
+
+        if (messageObject) {
+          const messageList = Object.keys(messageObject).map(key => ({
+            ...messageObject[key],
+            uid: key,
+          }));
+
+          this.setState({
+            messages: messageList,
+            loading: false,
+          });
+        } else {
+          this.setState({ messages: null, loading: false });
+        }
+      });
+  };
+
+  componentWillUnmount() {
+    this.props.firebase.messages().off();
+  }
+
+  onChangeText = event => {
+    this.setState({ text: event.target.value });
+  };
+
+  onCreateMessage = (event, authUser) => {
+    this.props.firebase.messages().push({
+      text: this.state.text,
+      userId: authUser.uid,
+      createdAt: this.props.firebase.serverValue.TIMESTAMP,
+    });
+
+    this.setState({ text: '' });
+
+    event.preventDefault();
+  };
+
+  onEditMessage = (message, text) => {
+    this.props.firebase.message(message.uid).set({
+      ...message,
+      text,
+      editedAt: this.props.firebase.serverValue.TIMESTAMP,
+    });
+  };
+
+  onRemoveMessage = uid => {
+    this.props.firebase.message(uid).remove();
+  };
+
+  onNextPage = () => {
+    this.setState(
+      state => ({ limit: state.limit + 5 }),
+      this.onListenForMessages,
+    );
+  };
+
+  render() {
+    const { users, usersLoading } = this.props;
+    const { text, messages, loading } = this.state;
+
+    return (
+      <AuthUserContext.Consumer>
+        {authUser => (
+          <div>
+            {!loading && messages && (
+              <button type="button" onClick={this.onNextPage}>
+                More
+              </button>
+            )}
+
+            {loading && usersLoading && <div>Loading ...</div>}
+
+            {users && messages && (
+              <MessageList
+                messages={messages.map(message => ({
+                  ...message,
+                  user: users[message.userId],
+                }))}
+                onEditMessage={this.onEditMessage}
+                onRemoveMessage={this.onRemoveMessage}
+              />
+            )}
+
+            {!messages && <div>There are no messages ...</div>}
+
+            <form
+              onSubmit={event =>
+                this.onCreateMessage(event, authUser)
+              }
+            >
+              <input
+                type="text"
+                value={text}
+                onChange={this.onChangeText}
+              />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        )}
+      </AuthUserContext.Consumer>
+    );
+  }
+}
+
+const MessageList = ({
+  messages,
+  onEditMessage,
+  onRemoveMessage,
+}) => (
+  <ul>
+    {messages.map(message => (
+      <MessageItem
+        key={message.uid}
+        message={message}
+        onEditMessage={onEditMessage}
+        onRemoveMessage={onRemoveMessage}
+      />
+    ))}
+  </ul>
+);
+
+class MessageItem extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editMode: false,
+      editText: this.props.message.text,
+    };
+  }
+
+  onToggleEditMode = () => {
+    this.setState(state => ({
+      editMode: !state.editMode,
+      editText: this.props.message.text,
+    }));
+  };
+
+  onChangeEditText = event => {
+    this.setState({ editText: event.target.value });
+  };
+
+  onSaveEditText = () => {
+    this.props.onEditMessage(this.props.message, this.state.editText);
+
+    this.setState({ editMode: false });
+  };
+
+  render() {
+    const { message, onRemoveMessage } = this.props;
+    const { editMode, editText } = this.state;
+
+    return (
+      <li>
+        {editMode ? (
+          <input
+            type="text"
+            value={editText}
+            onChange={this.onChangeEditText}
+          />
+        ) : (
+          <span>
+            <strong>{message.user.username}</strong> {message.text}{' '}
+            {message.editedAt && <span>(Edited)</span>}
+          </span>
+        )}
+
+        {editMode ? (
+          <span>
+            <button onClick={this.onSaveEditText}>Save</button>
+            <button onClick={this.onToggleEditMode}>Reset</button>
+          </span>
+        ) : (
+          <button onClick={this.onToggleEditMode}>Edit</button>
+        )}
+
+        {!editMode && (
+          <button
+            type="button"
+            onClick={() => onRemoveMessage(message.uid)}
+          >
+            Delete
+          </button>
+        )}
+      </li>
+    );
+  }
+}
+
+const Messages = withFirebase(MessagesBase);
+
+const condition = authUser => !!authUser;
 
 export default compose(
-  withAuthorization(authCondition),
-  connect(mapStateToProps, mapDispatchToProps)
+  withFirebase,
+  withEmailVerification,
+  withAuthorization(condition),
 )(HomePage);

@@ -1,34 +1,43 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'recompose';
 import { withRouter } from 'react-router-dom';
+import { compose } from 'recompose';
 
-import { firebase } from '../../firebase';
-import * as routes from '../../constants/routes';
+import AuthUserContext from './context';
+import { withFirebase } from '../Firebase';
+import * as ROUTES from '../../constants/routes';
 
-const withAuthorization = (condition) => (Component) => {
+const withAuthorization = condition => Component => {
   class WithAuthorization extends React.Component {
     componentDidMount() {
-      firebase.auth.onAuthStateChanged(authUser => {
-        if (!condition(authUser)) {
-          this.props.history.push(routes.SIGN_IN);
-        }
-      });
+      this.listener = this.props.firebase.onAuthUserListener(
+        authUser => {
+          if (!condition(authUser)) {
+            this.props.history.push(ROUTES.SIGN_IN);
+          }
+        },
+        () => this.props.history.push(ROUTES.SIGN_IN),
+      );
+    }
+
+    componentWillUnmount() {
+      this.listener();
     }
 
     render() {
-      return this.props.authUser ? <Component {...this.props} /> : null;
+      return (
+        <AuthUserContext.Consumer>
+          {authUser =>
+            condition(authUser) ? <Component {...this.props} /> : null
+          }
+        </AuthUserContext.Consumer>
+      );
     }
   }
 
-  const mapStateToProps = (state) => ({
-    authUser: state.sessionState.authUser,
-  });
-
   return compose(
     withRouter,
-    connect(mapStateToProps),
+    withFirebase,
   )(WithAuthorization);
-}
+};
 
 export default withAuthorization;
