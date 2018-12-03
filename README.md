@@ -1,30 +1,34 @@
 # react-redux-firebase-authentication
 
-[![Build Status](https://travis-ci.org/taming-the-state-in-react/react-redux-firebase-authentication.svg?branch=master)](https://travis-ci.org/taming-the-state-in-react/react-redux-firebase-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/)
+[![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-redux-firebase-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-redux-firebase-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-redux-firebase-authentication.svg)](https://greenkeeper.io/)
 
-* Found in [Taming the State in React](https://roadtoreact.com/course-details?courseId=TAMING_THE_STATE)
-* [Live](https://react-firebase-authentication.wieruch.com/)
 * [Tutorial](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [Live Version of half of the Tutorial](https://react-redux-firebase-authentication.wieruch.com/)
 
 ## Features
 
 * uses:
-  * React (create-react-app)
-  * firebase 5.0.0
-  * react-router 4.2.0
-  * redux
+  * only React (create-react-app)
+  * firebase 5
+  * react-router 4
+  * **redux**
 * features:
   * Sign In
   * Sign Up
   * Sign Out
   * Password Forget
   * Password Change
+  * Verification Email
   * Protected Routes with Authorization
-  * Database: Users
+  * Roles-based Authorization
+  * Social Logins with Google, Facebook and Twitter
+  * Linking of Social Logins on Account dashboard
+  * Auth Persistence with Local Storage
+  * Database with Users and Messages
 
 ## Installation
 
-* `git clone git@github.com:taming-the-state-in-react/react-redux-firebase-authentication.git`
+* `git clone git@github.com:the-road-to-react-with-firebase/react-redux-firebase-authentication.git`
 * `cd react-redux-firebase-authentication`
 * `npm install`
 * `npm start`
@@ -33,6 +37,6 @@
 
 ### Use your own Firebase Credentials
 
-* visit https://firebase.google.com/ and create a Firebase App
-* copy and paste your Credentials from your Firebase App into src/firebase/firebase.js
-* activate Email/Password Sign-In Method in your Firebase App
+* visit https://firebase.google.com and create a Firebase App
+* copy and paste your Credentials from your Firebase App into *src/components/Firebase/firebase.js* file or in .env file
+* activate Email/Password, Google, Facebook and Twitter Sign-In Methods for your Firebase App
