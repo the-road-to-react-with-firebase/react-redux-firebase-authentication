@@ -16,18 +16,18 @@ class UserItem extends Component {
   componentDidMount() {
     if (!this.props.user) {
       this.setState({ loading: true });
-
-      this.props.firebase
-        .user(this.props.match.params.id)
-        .on('value', snapshot => {
-          this.props.onSetUser(
-            snapshot.val(),
-            this.props.match.params.id,
-          );
-
-          this.setState({ loading: false });
-        });
     }
+
+    this.props.firebase
+      .user(this.props.match.params.id)
+      .on('value', snapshot => {
+        this.props.onSetUser(
+          snapshot.val(),
+          this.props.match.params.id,
+        );
+
+        this.setState({ loading: false });
+      });
   }
 
   componentWillUnmount() {
