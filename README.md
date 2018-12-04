@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/the-road-to-react-with-firebase/react-redux-firebase-authentication.svg?branch=master)](https://travis-ci.org/the-road-to-react-with-firebase/react-redux-firebase-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/the-road-to-react-with-firebase/react-redux-firebase-authentication.svg)](https://greenkeeper.io/)
 
-* [Tutorial](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [React + Firebase Tutorial](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
+* [React + Firebase + Redux Tutorial](https://www.robinwieruch.de/react-firebase-redux-tutorial)
 * [Live Version of half of the Tutorial](https://react-redux-firebase-authentication.wieruch.com/)
 
 ## Features
