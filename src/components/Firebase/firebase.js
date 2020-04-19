@@ -3,12 +3,13 @@ import 'firebase/auth';
 import 'firebase/database';
 
 const config = {
-  apiKey: process.env.REACT_APP_API_KEY,
-  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_DATABASE_URL,
-  projectId: process.env.REACT_APP_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  apiKey: 'AIzaSyAJvRzWqX9AjfqsiyFeNiisA2ilLsUvd0U',
+  authDomain: 'react-crud-app-76871.firebaseapp.com',
+  databaseURL: 'https://react-crud-app-76871.firebaseio.com',
+  projectId: 'react-crud-app-76871',
+  storageBucket: 'react-crud-app-76871.appspot.com',
+  messagingSenderId: '364667592995',
+  appId: '1:364667592995:web:c464ab9bbe8f695c67ec96',
 };
 
 class Firebase {
